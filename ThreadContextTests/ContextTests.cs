@@ -10,6 +10,36 @@ namespace ThreadContextTests
 
         [Theory]
         [ClassData(typeof(Runners))]
+        public void ShouldShareValuesInSameThread(Func<Action, object> runner)
+        {
+            object parent1Object1 = null;
+            object parent2Object1 = null;
+            object parent2Object2 = null;
+
+            var parent1 = runner(() =>
+            {
+                SetData(new object());
+                GetData(ref parent1Object1);
+            });
+
+            var parent2 = runner(() =>
+            {
+                GetData(ref parent2Object1);
+                SetData(new object());
+                GetData(ref parent2Object2);
+            });
+
+            using (new AssertionScope())
+            {
+                parent1Object1.Should().NotBeNull();
+                parent2Object1.Should().BeNull();
+                parent2Object2.Should().NotBeNull();
+                parent2Object2.Should().NotBeSameAs(parent1Object1);
+            }
+        }
+
+        [Theory]
+        [ClassData(typeof(Runners))]
         public void ShouldNotReplaceParentThreadValue(Func<Action, object> runner)
         {
             object parent1Object1 = null;
