@@ -118,9 +118,12 @@ namespace ThreadContextTests
             }
         }
 
-#if NET
         [Fact]
+#if NET
         public void ShouldShareValueBetweenTasksOfSameThread()
+#else
+        public void ShouldNotShareValueBetweenTasksOfSameThread()
+#endif
         {
             object parent1Object1 = null;
             object child1Object1 = null;
@@ -149,10 +152,14 @@ namespace ThreadContextTests
             using (new AssertionScope())
             {
                 parent1Object1.Should().NotBeNull();
+#if NET
                 child1Object1.Should().BeSameAs(parent1Object1);
                 child2Object1.Should().BeSameAs(parent1Object1);
+#else
+                child1Object1.Should().BeNull();
+                child2Object1.Should().BeNull();
+#endif
             }
         }
-#endif
     }
 }

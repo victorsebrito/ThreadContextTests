@@ -6,6 +6,10 @@ using System.Threading;
 
 namespace ThreadContextTests
 {
+    /// <summary>
+    /// Uses CallContext for .NET Framework and AsyncLocal/ThreadLocal
+    /// for .NET Core
+    /// </summary>
     internal static class Context
     {
 #if NETFRAMEWORK
