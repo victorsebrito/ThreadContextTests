@@ -4,7 +4,7 @@ namespace ThreadContextTests
 {
     internal class Runners : IEnumerable<object[]>
     {
-        private static Thread ThreadRunner(Action action)
+        public static Thread ThreadRunner(Action action)
         {
             var thread = new Thread(() => action());
             thread.Start();
@@ -13,7 +13,7 @@ namespace ThreadContextTests
             return thread;
         }
 
-        private static Task TaskRunner(Action action)
+        public static Task LongRunningTaskRunner(Action action)
         {
             // TaskCreationOptions.LongRunning makes sure the task
             // will be executed in a new thread
@@ -27,7 +27,7 @@ namespace ThreadContextTests
         public IEnumerator<object[]> GetEnumerator()
         {
             yield return new object[] { ThreadRunner };
-            yield return new object[] { TaskRunner };
+            yield return new object[] { LongRunningTaskRunner };
         }
 #pragma warning restore CS8974 // Converting method group to non-delegate type
 

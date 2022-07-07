@@ -117,5 +117,42 @@ namespace ThreadContextTests
                 child2Object1.Should().BeNull();
             }
         }
+
+#if NET
+        [Fact]
+        public void ShouldShareValueBetweenTasksOfSameThread()
+        {
+            object parent1Object1 = null;
+            object child1Object1 = null;
+            object child2Object1 = null;
+
+            Runners.ThreadRunner(() =>
+            {
+                var scheduler = new ImmediateTaskScheduler();
+
+                SetData(new object());
+                GetData(ref parent1Object1);
+
+                Task.Factory.StartNew(
+                    () => GetData(ref child1Object1),
+                    CancellationToken.None,
+                    TaskCreationOptions.None,
+                    scheduler).Wait();
+
+                Task.Factory.StartNew(
+                    () => GetData(ref child2Object1),
+                    CancellationToken.None,
+                    TaskCreationOptions.None,
+                    scheduler).Wait();
+            });
+
+            using (new AssertionScope())
+            {
+                parent1Object1.Should().NotBeNull();
+                child1Object1.Should().BeSameAs(parent1Object1);
+                child2Object1.Should().BeSameAs(parent1Object1);
+            }
+        }
+#endif
     }
 }
