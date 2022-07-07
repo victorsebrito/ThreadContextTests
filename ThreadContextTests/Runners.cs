@@ -13,7 +13,7 @@ namespace ThreadContextTests
             return thread;
         }
 
-        public static Task LongRunningTaskRunner(Action action)
+        public static Task TaskRunnerDifferentThread(Action action)
         {
             // TaskCreationOptions.LongRunning makes sure the task
             // will be executed in a new thread
@@ -23,11 +23,26 @@ namespace ThreadContextTests
             return task;
         }
 
+        public static Task TaskRunnerSameThread(Action action)
+        {
+            var scheduler = new ImmediateTaskScheduler();
+
+            var task = Task.Factory.StartNew(
+                    action,
+                    CancellationToken.None,
+                    TaskCreationOptions.None,
+                    scheduler);
+                
+            task.Wait();
+
+            return task;
+        }
+
 #pragma warning disable CS8974 // Converting method group to non-delegate type
         public IEnumerator<object[]> GetEnumerator()
         {
             yield return new object[] { ThreadRunner };
-            yield return new object[] { LongRunningTaskRunner };
+            yield return new object[] { TaskRunnerDifferentThread };
         }
 #pragma warning restore CS8974 // Converting method group to non-delegate type
 

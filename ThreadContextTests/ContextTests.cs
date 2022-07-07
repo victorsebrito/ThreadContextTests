@@ -131,22 +131,11 @@ namespace ThreadContextTests
 
             Runners.ThreadRunner(() =>
             {
-                var scheduler = new ImmediateTaskScheduler();
-
                 SetData(new object());
                 GetData(ref parent1Object1);
 
-                Task.Factory.StartNew(
-                    () => GetData(ref child1Object1),
-                    CancellationToken.None,
-                    TaskCreationOptions.None,
-                    scheduler).Wait();
-
-                Task.Factory.StartNew(
-                    () => GetData(ref child2Object1),
-                    CancellationToken.None,
-                    TaskCreationOptions.None,
-                    scheduler).Wait();
+                Runners.TaskRunnerSameThread(() => GetData(ref child1Object1));
+                Runners.TaskRunnerSameThread(() => GetData(ref child2Object1));
             });
 
             using (new AssertionScope())
